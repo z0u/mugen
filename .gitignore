@@ -2,3 +2,4 @@ data
 pyenv
 *.pyc
 __pycache__
+.pytest_cache
