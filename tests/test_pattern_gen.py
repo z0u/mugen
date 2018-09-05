@@ -8,6 +8,6 @@ from steps import *
 scenario = partial(pytest_bdd.scenario, 'pattern_gen.feature')
 
 
-@scenario('Extend a short repeating sequence')
+@scenario('Extend a sawtooth wave')
 def test_scenario():
     pass
