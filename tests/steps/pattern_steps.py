@@ -43,31 +43,32 @@ def sequences(steps):
     seq_length = 100
     channels = 1
     input_sequence = np.array(sawtooth(steps, seq_length, channels))
-    input_sequence = np.broadcast_to(input_sequence, (batch_size, seq_length, channels))
+    input_sequence = np.broadcast_to(
+        input_sequence, (batch_size, seq_length, channels))
     return input_sequence
 
 
-@given(parse('the model has been trained on that sequence for {epochs:d} epochs'))
+@given(parse('the model has been trained for {epochs:d} epochs'))
 def trained_model(sequences, epochs):
     seq_length = sequences.shape[1] - 1
     channels = sequences.shape[2]
     model = Mugen(seq_length, channels)
     model.build_model()
     input_sequences = sequences[:, :seq_length, :]
-    next_notes = sequences[:, -1, :]
+    next_samples = sequences[:, -1, :]
     for _ in range(epochs):
-        model.train(input_sequences, next_notes)
+        model.train(input_sequences, next_samples)
     return model
 
 
-@when('the next note is generated')
+@when('the next sample is generated')
 def predict(sequences, trained_model, prediction):
     seq_length = sequences.shape[1] - 1
     input_sequences = sequences[:, :seq_length, :]
-    prediction.value = trained_model.predict(input_sequences)
+    prediction.value = trained_model.generate_sample_batch(input_sequences)
 
 
 @then('the extension matches the initial sequence')
 def validate(sequences, prediction):
-    next_notes = sequences[:, -1, :]
-    assert np.all(prediction.value == next_notes)
+    next_samples = sequences[:, -1, :]
+    assert np.all(prediction.value == next_samples)

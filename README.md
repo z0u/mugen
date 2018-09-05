@@ -6,6 +6,14 @@ First [set up](#Setup) the environment (see below). Then train with:
 python -m mugen train
 ```
 
+## Testing
+
+First [set up](#Setup) the environment (see below). Then test with:
+
+```
+py.test --pylama
+```
+
 ## Setup
 
 After a fresh checkout:
