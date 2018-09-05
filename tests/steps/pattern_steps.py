@@ -8,44 +8,44 @@ from pytest_bdd.parsers import parse
 from mugen import Mugen
 
 
-@fixture
-def prediction():
-    return Prediction()
-
-
 class Prediction:
     @property
-    def value(self):
+    def value(self) -> np.array:
         return self._value
 
     @value.setter
-    def value(self, value):
+    def value(self, value: np.array):
         self._value = value
 
     def __repr__(self):
         return repr(self._value)
 
 
-def repeat_for(template, offset, length):
+@fixture
+def prediction() -> Prediction:
+    return Prediction()
+
+
+def repeat_for(template, offset: int, length: int):
     return islice(cycle(template), offset, offset + length)
 
 
-def sawtooth(period, length, channels):
+def sawtooth(period: int, offset: int, length: int, channels: int):
     def point(i):
         return (i,) * channels
     template = tuple(point(i) for i in range(period))
-    return list(repeat_for(template, 0, length))
+    return list(repeat_for(template, offset, length))
 
 
 @given(parse('a sawtooth wave of {steps:d} steps'), target_fixture='sequences')
-def sawtooth_sequences(steps):
+def sawtooth_sequences(steps: int):
     batch_size = 100
     seq_length = 100
     channels = 1
-    input_sequence = np.array(sawtooth(steps, seq_length, channels))
-    input_sequence = np.broadcast_to(
-        input_sequence, (batch_size, seq_length, channels))
-    return input_sequence
+    sequences = np.stack([
+        sawtooth(steps, i, seq_length, channels)
+        for i in range(batch_size)])
+    return sequences
 
 
 @given('some random but static sequences', target_fixture='sequences')
