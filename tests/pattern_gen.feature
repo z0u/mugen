@@ -5,3 +5,9 @@ Scenario: Extend a sawtooth wave
   And the model has been trained for 10 epochs
   When the next sample is generated
   Then the extension matches the initial sequence
+
+Scenario: Extend random data
+  Given some random but static sequences
+  And the model has been trained for 100 epochs
+  When the next sample is generated
+  Then the extension matches the initial sequence

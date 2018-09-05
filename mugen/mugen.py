@@ -15,6 +15,8 @@ class Mugen:
         x = input_series
         x = Conv1D(filters=64, kernel_size=6, activation='relu')(x)
         x = MaxPool1D(pool_size=2)(x)
+        x = Conv1D(filters=64, kernel_size=6, activation='relu')(x)
+        x = MaxPool1D(pool_size=2)(x)
         x = Flatten()(x)
         prediction = Dense(self.channels)(x)
 

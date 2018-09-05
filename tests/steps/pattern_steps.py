@@ -26,19 +26,19 @@ class Prediction:
         return repr(self._value)
 
 
-def repeat_for(template, length):
-    return islice(cycle(template), length)
+def repeat_for(template, offset, length):
+    return islice(cycle(template), offset, offset + length)
 
 
 def sawtooth(period, length, channels):
     def point(i):
         return (i,) * channels
     template = tuple(point(i) for i in range(period))
-    return list(repeat_for(template, length))
+    return list(repeat_for(template, 0, length))
 
 
-@given(parse('a sawtooth wave of {steps:d} steps'))
-def sequences(steps):
+@given(parse('a sawtooth wave of {steps:d} steps'), target_fixture='sequences')
+def sawtooth_sequences(steps):
     batch_size = 100
     seq_length = 100
     channels = 1
@@ -46,6 +46,14 @@ def sequences(steps):
     input_sequence = np.broadcast_to(
         input_sequence, (batch_size, seq_length, channels))
     return input_sequence
+
+
+@given('some random but static sequences', target_fixture='sequences')
+def random_sequences():
+    batch_size = 100
+    seq_length = 100
+    channels = 1
+    return np.random.random_integers(0, 10, (batch_size, seq_length, channels))
 
 
 @given(parse('the model has been trained for {epochs:d} epochs'))
@@ -56,8 +64,7 @@ def trained_model(sequences, epochs):
     model.build_model()
     input_sequences = sequences[:, :seq_length, :]
     next_samples = sequences[:, -1, :]
-    for _ in range(epochs):
-        model.train(input_sequences, next_samples)
+    model.train(input_sequences, next_samples, epochs)
     return model
 
 
