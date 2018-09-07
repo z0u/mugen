@@ -1,7 +1,9 @@
 keras==2.2.2
 matplotlib==2.2.3
+mido==1.2.8
 pytest==3.6.4
 pytest-bdd==2.21.0
+python-rtmidi==1.1.1
 tensorflow==1.10.1
 
 pylama==7.4.3
