@@ -5,7 +5,7 @@ from pytest import fixture
 from pytest_bdd import given, when, then
 from pytest_bdd.parsers import parse
 
-from mugen import Mugen
+from mugen.mugen import Mugen
 
 
 class Prediction:
