@@ -7,23 +7,12 @@ from pytest_bdd.parsers import parse
 
 from mugen.mugen import Mugen
 
-
-class Prediction:
-    @property
-    def value(self) -> np.array:
-        return self._value
-
-    @value.setter
-    def value(self, value: np.array):
-        self._value = value
-
-    def __repr__(self):
-        return repr(self._value)
+from .mutable_fixture import MutableFixture
 
 
 @fixture
-def prediction() -> Prediction:
-    return Prediction()
+def prediction() -> MutableFixture:
+    return MutableFixture()
 
 
 def repeat_for(template, offset: int, length: int):
@@ -57,7 +46,7 @@ def random_sequences():
 
 
 @given(parse('the model has been trained for {epochs:d} epochs'))
-def trained_model(sequences, epochs):
+def trained_model(sequences: np.array, epochs: int):
     seq_length = sequences.shape[1] - 1
     channels = sequences.shape[2]
     model = Mugen(seq_length, channels)
@@ -69,13 +58,16 @@ def trained_model(sequences, epochs):
 
 
 @when('the next sample is generated')
-def predict(sequences, trained_model, prediction):
+def predict(
+        sequences: np.array,
+        trained_model: Mugen,
+        prediction: MutableFixture[np.array]):
     seq_length = sequences.shape[1] - 1
     input_sequences = sequences[:, :seq_length, :]
     prediction.value = trained_model.generate_sample_batch(input_sequences)
 
 
 @then('the extension matches the initial sequence')
-def validate(sequences, prediction):
+def validate(sequences: np.array, prediction: MutableFixture[np.array]):
     next_samples = sequences[:, -1, :]
     assert np.all(prediction.value == next_samples)

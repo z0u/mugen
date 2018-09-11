@@ -1,18 +1,20 @@
 Mugen is a ML-based parameterised music generator.
 
-First [set up](#Setup) the environment (see below). Then train with:
-
-```
-python -m mugen train
-```
 
 ## Testing
 
-First [set up](#Setup) the environment (see below). Then test with:
+First [set up](#setup) the environment (see below). Then test with:
 
 ```
-py.test --pylama
+pytest
 ```
+
+Features under development are marked with `@wip` and are skipped from testing by default. To run those tests, run:
+
+```
+pytest -k wip
+```
+
 
 ## Setup
 
