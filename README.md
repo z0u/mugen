@@ -20,7 +20,7 @@ pytest -k wip
 
 After a fresh checkout:
 ```
-python3 -m easy-install virtualenv
+python3 -c "import virtualenv" 2>/dev/null || python3 -m easy-install virtualenv
 python3 -m virtualenv pyenv
 source pyenv/bin/activate
 pip install -r requirements.txt
