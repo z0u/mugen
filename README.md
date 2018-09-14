@@ -18,20 +18,16 @@ pytest -k wip
 
 ## Setup
 
-After a fresh checkout, and when requirements change:
+After a fresh checkout, or when requirements change, or when starting work:
 ```
-./setup_env.sh
-```
-
-When starting work on this project:
-```
-source .venv/bin/activate
+source activate.sh
 ```
 
 When stopping work:
 ```
 deactivate
 ```
+
 
 ## Playing MIDI on Mac OS
 
