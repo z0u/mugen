@@ -18,22 +18,14 @@ pytest -k wip
 
 ## Setup
 
-After a fresh checkout:
+After a fresh checkout, and when requirements change:
 ```
-python3 -c "import virtualenv" 2>/dev/null || python3 -m easy-install virtualenv
-python3 -m virtualenv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+./setup_env.sh
 ```
 
 When starting work on this project:
 ```
 source .venv/bin/activate
-```
-
-When requirements change:
-```
-pip install -r requirements.txt
 ```
 
 When stopping work:
