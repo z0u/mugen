@@ -21,14 +21,14 @@ pytest -k wip
 After a fresh checkout:
 ```
 python3 -c "import virtualenv" 2>/dev/null || python3 -m easy-install virtualenv
-python3 -m virtualenv pyenv
-source pyenv/bin/activate
+python3 -m virtualenv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
 When starting work on this project:
 ```
-source pyenv/bin/activate
+source .venv/bin/activate
 ```
 
 When requirements change:
