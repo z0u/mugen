@@ -4,11 +4,11 @@
 
 0. _batch_
 1. time
-2. channel
-3. sample data; vector of
-  - 1-hot encoding of note data
-  - instrument/voice
-  - strength of attack
+2. sample data
+ - voice
+ - probability (always 1)
+ - velocities of pitches from 0 (off) to 1 (fastest)
+3. track (analogous to channel in image processing)
 
 
 ## Output from classification model
@@ -26,11 +26,11 @@
 
 0. _batch_
 1. time
-2. channel
-3. sample data; vector of
-  - 1-hot encoding of note data
-  - instrument/voice
-  - strength of attack
+2. sample data
+ - voice
+ - probability (always 1)
+ - velocities of pitches from 0 (off) to 1 (fastest)
+3. track (analogous to channel in image processing)
 
 1D tensor representing current musical style:
 
@@ -43,10 +43,10 @@
 2D tensor representing the next notes to play:
 
 0. _batch_
-1. channel
-2. sample data; vector of
-  - 1-hot encoding of note data
-  - instrument/voice
-  - strength of attack
+1. sample data, concatenation of:
+ - voice
+ - probability that this is the appropriate sample to play next
+ - velocities of pitches from 0 (off) to 1 (fastest)
+2. track (analogous to channel in image processing)
 
 > Q: Should the generative model also output the current style, to ensure that the style that was input is being used

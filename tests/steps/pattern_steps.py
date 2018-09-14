@@ -15,44 +15,45 @@ def prediction() -> MutableFixture:
     return MutableFixture()
 
 
-def repeat_for(template, offset: int, length: int):
-    return islice(cycle(template), offset, offset + length)
+def progression_2d(time_steps, pitches):
+    base_progression = np.zeros((time_steps, pitches))
+    base_progression[
+        np.arange(time_steps),
+        np.arange(time_steps) // (time_steps // pitches)] = 1
+    return base_progression
 
 
-def sawtooth(period: int, offset: int, length: int, channels: int):
-    def point(i):
-        return (i,) * channels
-    template = tuple(point(i) for i in range(period))
-    return list(repeat_for(template, offset, length))
+@given(parse('a progression of 10 pitches'), target_fixture='sequences')
+def progression_sequences():
+    time_steps = batch_size = 100
+    pitches = 10
+    tracks = 1
 
+    base_progression = progression_2d(time_steps, pitches)
+    sequences = np.zeros((batch_size, time_steps, pitches, tracks))
+    for i, variant in enumerate(sequences):
+        variant[:, :, 0] = np.roll(base_progression, i, axis=0)
 
-@given(parse('a sawtooth wave of {steps:d} steps'), target_fixture='sequences')
-def sawtooth_sequences(steps: int):
-    batch_size = 100
-    seq_length = 100
-    channels = 1
-    sequences = np.stack([
-        sawtooth(steps, i, seq_length, channels)
-        for i in range(batch_size)])
     return sequences
 
 
 @given('some random but static sequences', target_fixture='sequences')
 def random_sequences():
-    batch_size = 100
-    seq_length = 100
-    channels = 1
-    return np.random.random_integers(0, 10, (batch_size, seq_length, channels))
+    time_steps = batch_size = 100
+    pitches = 10
+    tracks = 1
+    return np.random.random((batch_size, time_steps, pitches, tracks))
 
 
 @given(parse('the model has been trained for {epochs:d} epochs'))
 def trained_model(sequences: np.array, epochs: int):
-    seq_length = sequences.shape[1] - 1
-    channels = sequences.shape[2]
-    model = Mugen(seq_length, channels)
+    batches, time_steps, pitches, tracks = sequences.shape
+    # Use final sample as output
+    time_steps -= 1
+    model = Mugen(time_steps, pitches, tracks)
     model.build_model()
-    input_sequences = sequences[:, :seq_length, :]
-    next_samples = sequences[:, -1, :]
+    input_sequences = sequences[:, :-1, :, :]
+    next_samples = sequences[:, -1, :, :]
     model.train(input_sequences, next_samples, epochs)
     return model
 
@@ -62,12 +63,14 @@ def predict(
         sequences: np.array,
         trained_model: Mugen,
         prediction: MutableFixture[np.array]):
-    seq_length = sequences.shape[1] - 1
-    input_sequences = sequences[:, :seq_length, :]
+    input_sequences = sequences[:, :-1, :, :]
     prediction.value = trained_model.generate_sample_batch(input_sequences)
 
 
 @then('the extension matches the initial sequence')
 def validate(sequences: np.array, prediction: MutableFixture[np.array]):
-    next_samples = sequences[:, -1, :]
+    next_samples = sequences[:, -1, :, :]
+    with np.printoptions(precision=3, floatmode='fixed', suppress=True):
+        print(next_samples[:, :, 0])
+        print(prediction.value[:, :, 0])
     assert np.all(prediction.value == next_samples)

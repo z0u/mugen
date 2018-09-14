@@ -1,13 +1,13 @@
 Feature: Extend simple sequences
 
-Scenario: Extend a sawtooth wave
-  Given a sawtooth wave of 5 steps
+Scenario: Extend a progression
+  Given a progression of 10 pitches
   And the model has been trained for 20 epochs
   When the next sample is generated
   Then the extension matches the initial sequence
 
 Scenario: Extend random data
   Given some random but static sequences
-  And the model has been trained for 100 epochs
+  And the model has been trained for 20 epochs
   When the next sample is generated
   Then the extension matches the initial sequence
