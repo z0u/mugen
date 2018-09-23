@@ -28,6 +28,15 @@ When stopping work:
 deactivate
 ```
 
+If you're using Iterm2, you can get figures displaying in your terminal with [itermplot]. Install it like this, and then run the tests as normal:
+
+```
+pip install itermplot
+export MPLBACKEND=module://itermplot ITERMPLOT=rv
+```
+
+[itermplot]: https://github.com/daleroberts/itermplot
+
 
 ## Playing MIDI on Mac OS
 
