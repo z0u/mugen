@@ -1,4 +1,11 @@
-from keras.layers import Conv2D, Dense, Flatten, Input, MaxPool2D, Reshape
+from keras.layers import (
+    Conv2D,
+    Dense,
+    Flatten,
+    Input,
+    MaxPool2D,
+    Reshape,
+)
 from keras.models import Model
 import numpy as np
 
@@ -24,10 +31,8 @@ class Mugen:
         x = Conv2D(
             filters=64, kernel_size=3, padding='same', activation='relu')(x)
         x = MaxPool2D(pool_size=2)(x)
-        x = Conv2D(
-            filters=64, kernel_size=3, padding='same', activation='relu')(x)
-        x = MaxPool2D(pool_size=2)(x)
         x = Flatten()(x)
+
         x = Dense(self.pitches * self.tracks * 8, activation='relu')(x)
         x = Dense(self.pitches * self.tracks, activation='relu')(x)
         x = Reshape((self.pitches, self.tracks))(x)
