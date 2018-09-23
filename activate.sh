@@ -26,9 +26,17 @@ function set_up_env() {
 
 
 function install_deps() {
-  if ! md5sum requirements.txt | diff -q .venv/hash.txt -; then
+  if ! md5sum requirements.txt | diff -q .venv/requirements.txt.md5 -; then
     pip install -r requirements.txt || return
-    md5sum requirements.txt > .venv/hash.txt || return
+    md5sum requirements.txt > .venv/requirements.txt.md5 || return
+  fi
+  if ! md5sum requirements-test.txt | diff -q .venv/requirements-test.txt.md5 -; then
+    pip install -r requirements-test.txt || return
+    md5sum requirements-test.txt > .venv/requirements-test.txt.md5 || return
+  fi
+  if ! md5sum requirements-dev.txt | diff -q .venv/requirements-dev.txt.md5 -; then
+    pip install -r requirements-dev.txt || return
+    md5sum requirements-dev.txt > .venv/requirements-dev.txt.md5 || return
   fi
 }
 
