@@ -26,8 +26,8 @@ def progression_2d(time_steps, pitches):
 
 @given(parse('a progression of 10 pitches'), target_fixture='sequences')
 def progression_sequences():
-    time_steps = batch_size = 72
     pitches = 12
+    time_steps = batch_size = pitches * 8
     tracks = 1
 
     base_progression = progression_2d(time_steps, pitches)

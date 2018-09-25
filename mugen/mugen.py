@@ -1,9 +1,11 @@
 from keras.layers import (
-    Conv2D,
+    # Conv2D,
+    ConvLSTM2D,
     Dense,
     Flatten,
     Input,
-    MaxPool2D,
+    # LSTM,
+    # MaxPool2D,
     Reshape,
 )
 from keras.models import Model
@@ -17,23 +19,18 @@ class Mugen:
         self.tracks = tracks
         self.pitches = pitches
 
-    @property
-    def sample_dims(self):
-        probability_vars = 1
-        voice_vars = 128
-        return voice_vars + probability_vars + self.pitches
-
     def build_model(self):
         input_series = Input(
             shape=(self.time_steps, self.pitches, self.tracks))
 
         x = input_series
-        x = Conv2D(
-            filters=64, kernel_size=3, padding='same', activation='relu')(x)
-        x = MaxPool2D(pool_size=2)(x)
-        x = Flatten()(x)
+        x = Reshape((self.time_steps, self.pitches, 1, self.tracks))(x)
+        # x = ConvLSTM2D(filters=32, kernel_size=(3, 1), return_sequences=True)(x)
+        x = ConvLSTM2D(
+            filters=64, kernel_size=(3, 1), padding='same', strides=2,
+            dropout=0.0, recurrent_dropout=0.0)(x)
 
-        x = Dense(self.pitches * self.tracks * 8, activation='relu')(x)
+        x = Flatten()(x)
         x = Dense(self.pitches * self.tracks, activation='relu')(x)
         x = Reshape((self.pitches, self.tracks))(x)
         prediction = x
