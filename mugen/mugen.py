@@ -25,7 +25,10 @@ class Mugen:
 
         x = input_series
         x = Reshape((self.time_steps, self.pitches, 1, self.tracks))(x)
-        # x = ConvLSTM2D(filters=32, kernel_size=(3, 1), return_sequences=True)(x)
+        # x = ConvLSTM2D(
+        #     filters=32, kernel_size=(3, 1), padding='same', strides=2,
+        #     dropout=0.0, recurrent_dropout=0.0,
+        #     return_sequences=True)(x)
         x = ConvLSTM2D(
             filters=64, kernel_size=(3, 1), padding='same', strides=2,
             dropout=0.0, recurrent_dropout=0.0)(x)

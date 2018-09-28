@@ -1,2 +1,8 @@
 ipython==6.5.0
 jupyter==1.0.0
+Pillow==5.2.0
+pydot==1.2.4
+
+# Iterm / Mac stuff
+iterm2-tools==2.3
+itermplot==0.331

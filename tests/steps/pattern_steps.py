@@ -1,6 +1,5 @@
 from itertools import cycle, islice
 
-import matplotlib.pyplot as plt
 import numpy as np
 from pytest import fixture
 from pytest_bdd import given, when, then
@@ -39,12 +38,13 @@ def progression_sequences():
 
 
 @given(parse('the model has been trained for {epochs:d} epochs'))
-def trained_model(sequences: np.array, epochs: int):
+def trained_model(sequences: np.array, epochs: int, vis):
     batches, time_steps, pitches, tracks = sequences.shape
     # Use final sample as output
     time_steps -= 1
     model = Mugen(time_steps, pitches, tracks)
     model.build_model()
+    vis.plot_model(model.model)
     input_sequences = sequences[:, :-1, :, :]
     next_samples = sequences[:, -1, :, :]
     model.train(input_sequences, next_samples, epochs)
@@ -61,30 +61,11 @@ def predict(
 
 
 @then('the extension matches the initial sequence')
-def validate(sequences: np.array, prediction: MutableFixture[np.array]):
+def validate(sequences: np.array, prediction: MutableFixture[np.array], vis):
     next_samples = sequences[:, -1, :, :]
-    display_actual_vs_expected(next_samples, prediction.value)
+    vis.plot_actual_vs_expected(next_samples, prediction.value)
+    print("MSE: %.3f" % find_mse(next_samples, prediction.value))
     # assert find_mse(next_samples, prediction.value) < 0.01
-
-
-def display_actual_vs_expected(actual, expected):
-    difference = expected - actual
-    fig = plt.figure()
-    ax1 = fig.add_subplot(131)
-    ax1.set_title('Expected')
-    ax1.set_ylabel('time')
-    ax1.set_xlabel('pitch')
-    plt.imshow(actual[:, :, 0])
-    ax2 = fig.add_subplot(132, sharey=ax1)
-    ax2.set_title('Actual')
-    ax2.set_xlabel('pitch')
-    plt.imshow(expected[:, :, 0])
-    ax3 = fig.add_subplot(133, sharey=ax1)
-    ax3.set_title('Difference')
-    ax3.set_xlabel('pitch')
-    plt.imshow(abs(difference[:, :, 0]))
-    plt.show()
-    print("MSE: %.3f" % find_mse(actual, expected))
 
 
 def find_mse(actual, expected):
