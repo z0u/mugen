@@ -49,10 +49,13 @@ class Mugen:
             self,
             input_sequences: np.array,
             next_samples: np.array,
-            epochs: int = 1):
+            epochs: int = 1,
+            callbacks: list = None):
         assert input_sequences.shape[1:] == (
             self.time_steps, self.pitches, self.tracks)
-        self.model.fit(input_sequences, next_samples, epochs=epochs)
+        self.model.fit(
+            input_sequences, next_samples, epochs=epochs,
+            verbose=0, callbacks=callbacks)
 
     def generate_sample_batch(self, input_sequences: np.array) -> np.array:
         assert input_sequences.shape[1:] == (

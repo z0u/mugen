@@ -38,16 +38,18 @@ def progression_sequences():
 
 
 @given(parse('the model has been trained for {epochs:d} epochs'))
-def trained_model(sequences: np.array, epochs: int, vis):
+def trained_model(sequences: np.array, epochs: int, ui):
     batches, time_steps, pitches, tracks = sequences.shape
     # Use final sample as output
     time_steps -= 1
     model = Mugen(time_steps, pitches, tracks)
     model.build_model()
-    vis.plot_model(model.model)
+    ui.plot_model(model.model)
     input_sequences = sequences[:, :-1, :, :]
     next_samples = sequences[:, -1, :, :]
-    model.train(input_sequences, next_samples, epochs)
+    model.train(
+        input_sequences, next_samples, epochs,
+        callbacks=[ui.progress_callback])
     return model
 
 
@@ -61,9 +63,9 @@ def predict(
 
 
 @then('the extension matches the initial sequence')
-def validate(sequences: np.array, prediction: MutableFixture[np.array], vis):
+def validate(sequences: np.array, prediction: MutableFixture[np.array], ui):
     next_samples = sequences[:, -1, :, :]
-    vis.plot_actual_vs_expected(next_samples, prediction.value)
+    ui.plot_actual_vs_expected(next_samples, prediction.value)
     print("MSE: %.3f" % find_mse(next_samples, prediction.value))
     # assert find_mse(next_samples, prediction.value) < 0.01
 

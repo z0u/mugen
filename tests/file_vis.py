@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 
+from keras.callbacks import Callback
 from keras.utils import plot_model
 import matplotlib
 from PIL import Image, ImageOps
@@ -15,12 +16,16 @@ def get_test_data_dir():
     return os.path.join(os.path.dirname(__file__), 'data')
 
 
-class PlotToFile:
+class HeadlessUi:
     def __init__(self, double_resolution: bool, dark_background: bool):
         self.double_resolution = double_resolution
         self.dark_background = dark_background
         self.save_model = bool(shutil.which('dot'))
         self.output_dir = os.path.join(get_test_data_dir(), 'stats')
+
+    @property
+    def progress_callback(self):
+        return NoninteractiveProgress()
 
     def ensure_output_dir(self):
         os.makedirs(self.output_dir, exist_ok=True)
@@ -79,3 +84,37 @@ class PlotToFile:
         filename = os.path.join(output_dir, 'diff.png')
         plt.savefig(filename, dpi=self.matplotlib_resolution)
         return filename
+
+
+class NoninteractiveProgress(Callback):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.reset()
+
+    def reset(self):
+        self.epoch = 0
+        self.epochs = 1
+        self.epoch_size = 1
+        self.samples_seen = 0
+        self.metrics = {}
+
+    def update(self):
+        print('\rEpoch %d/%d' % (self.epoch + 1, self.epochs))
+
+    def on_train_begin(self, logs=None):
+        self.reset()
+        self.epochs = self.params['epochs']
+
+    def on_epoch_begin(self, epoch, logs=None):
+        self.epoch = epoch
+        self.epoch_size = self.params['samples']
+        self.samples_seen = 0
+
+    def on_batch_end(self, batch, logs=None):
+        logs = logs or {}
+        self.samples_seen += logs.get('size', 0)
+        self.metrics = {k: logs[k] for k in self.params['metrics']}
+        self.update()
+
+    def on_train_end(self, logs=None):
+        print('Training complete\n')
