@@ -1,7 +1,9 @@
+import datetime
 import os
 import shutil
 from sys import stdout
 import tempfile
+import time
 
 import iterm2_tools
 from keras.callbacks import Callback
@@ -35,6 +37,18 @@ class ITermUi(HeadlessUi):
 
 
 class InteractiveProgress(NoninteractiveProgress):
+    def reset(self):
+        super().reset()
+        self.epoch_duration = 0
+
+    def on_epoch_begin(self, *args, **kwargs):
+        super().on_epoch_begin(*args, **kwargs)
+        self.epoch_start = time.perf_counter()
+
+    def on_epoch_end(self, *args, **kwargs):
+        super().on_epoch_end(*args, **kwargs)
+        self.epoch_duration = time.perf_counter() - self.epoch_start
+
     def update(self):
         metrics = []
         for metric in self.metrics.items():
@@ -44,7 +58,13 @@ class InteractiveProgress(NoninteractiveProgress):
         progress = self.epoch / self.epochs
         progress += (self.samples_seen / self.epoch_size) / self.epochs
         progress = min(progress, 1.0)
-        prog_str = '%2.1f%%' % (progress * 100)
+        if self.epoch_duration:
+            remaining_duration = int(
+                self.epoch_duration * (self.epochs - self.epoch))
+            duration_str = str(datetime.timedelta(seconds=remaining_duration))
+        else:
+            duration_str = '--:--:--'
+        prog_str = '%4.1f%% %s' % (progress * 100, duration_str)
 
         bar_cols = self.get_cols() - (len(prog_str) + len(metrics_str) + 2) - 1
         bar_str = self.render_bar(bar_cols, progress)
