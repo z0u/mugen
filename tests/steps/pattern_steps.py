@@ -47,9 +47,10 @@ def trained_model(sequences: np.array, epochs: int, ui):
     ui.plot_model(model.model)
     input_sequences = sequences[:, :-1, :, :]
     next_samples = sequences[:, -1, :, :]
-    model.train(
+    history = model.train(
         input_sequences, next_samples, epochs,
         callbacks=[ui.progress_callback])
+    ui.plot_history(history)
     return model
 
 

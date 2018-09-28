@@ -53,7 +53,7 @@ class Mugen:
             callbacks: list = None):
         assert input_sequences.shape[1:] == (
             self.time_steps, self.pitches, self.tracks)
-        self.model.fit(
+        return self.model.fit(
             input_sequences, next_samples, epochs=epochs,
             verbose=0, callbacks=callbacks)
 

@@ -16,16 +16,21 @@ class ITermUi(HeadlessUi):
         return InteractiveProgress()
 
     def plot_model(self, model):
-        fname = super().plot_model(model)
-        if not fname:
+        filename = super().plot_model(model)
+        if not filename:
             return
         print()
-        iterm2_tools.images.display_image_file(fname)
+        iterm2_tools.images.display_image_file(filename)
+        print()
+
+    def plot_history(self, history):
+        filename = super().plot_history(history)
+        iterm2_tools.images.display_image_file(filename)
         print()
 
     def plot_actual_vs_expected(self, actual, expected):
-        fname = super().plot_actual_vs_expected(actual, expected)
-        iterm2_tools.images.display_image_file(fname)
+        filename = super().plot_actual_vs_expected(actual, expected)
+        iterm2_tools.images.display_image_file(filename)
         print()
 
 
@@ -66,6 +71,9 @@ class InteractiveProgress(NoninteractiveProgress):
         pad_cols = cols - len(message)
         return message + (' ' * pad_cols)
 
-    def on_train_end(self, logs=None):
-        stdout.write('\r' + self.pad_to_term_width('Training complete') + '\n')
+    def clear_line(self):
+        stdout.write('\r' + self.pad_to_term_width('') + '\r')
         stdout.flush()
+
+    def on_train_end(self, logs=None):
+        self.clear_line()

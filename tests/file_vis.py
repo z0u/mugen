@@ -60,6 +60,20 @@ class HeadlessUi:
         else:
             return 90
 
+    def plot_history(self, history):
+        if self.dark_background:
+            plt.style.use('dark_background')
+        plt.figure()
+        keys = sorted(history.history.keys())
+        for k in keys:
+            plt.plot(history.history[k])
+        plt.legend(keys, loc='upper left')
+
+        output_dir = self.ensure_output_dir()
+        filename = os.path.join(output_dir, 'history.png')
+        plt.savefig(filename, dpi=self.matplotlib_resolution)
+        return filename
+
     def plot_actual_vs_expected(self, actual, expected):
         difference = expected - actual
         if self.dark_background:
