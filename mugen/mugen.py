@@ -9,6 +9,7 @@ from keras.layers import (
     Reshape,
 )
 from keras.models import Model
+from keras import backend as K
 import numpy as np
 
 
@@ -30,7 +31,7 @@ class Mugen:
         #     dropout=0.0, recurrent_dropout=0.0,
         #     return_sequences=True)(x)
         x = ConvLSTM2D(
-            filters=64, kernel_size=(3, 1), padding='same', strides=2,
+            filters=32, kernel_size=(3, 1), padding='same', strides=2,
             dropout=0.0, recurrent_dropout=0.0)(x)
 
         x = Flatten()(x)
