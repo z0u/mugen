@@ -26,7 +26,8 @@ def progression_2d(time_steps, pitches):
 def add_tempo(sequence, ticks_per_beat):
     time_steps, pitches, tracks = sequence.shape
     beats = time_steps // ticks_per_beat
-    time_divisions = np.array([1, 2, 3, 4, 6]).reshape((1, 5))
+    time_divisions = np.array([2, 4]).reshape((1, 2))
+    # time_divisions = np.array([1, 1, 2, 3, 4, 6]).reshape((1, 6))
     n_divisions = time_divisions.shape[1]
     tick_progression = np.repeat(
         np.arange(ticks_per_beat)[:, np.newaxis],
@@ -47,12 +48,12 @@ def progression_sequences():
 
     base_progression = progression_2d(time_steps, pitches)
     base_progression = base_progression[:, :, np.newaxis]
-    timed_base_progression = add_tempo(base_progression, ticks_per_beat)
-    width = timed_base_progression.shape[1]
+    base_progression = add_tempo(base_progression, ticks_per_beat)
+    width = base_progression.shape[1]
 
     sequences = np.zeros((batch_size, time_steps, width, tracks))
     for i, variant in enumerate(sequences):
-        variant[:, :, :] = np.roll(timed_base_progression, i, axis=0)
+        variant[:, :, :] = np.roll(base_progression, i, axis=0)
 
     return sequences
 

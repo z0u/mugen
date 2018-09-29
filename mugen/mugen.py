@@ -1,15 +1,17 @@
 from keras.layers import (
-    # Conv2D,
+    Concatenate,
+    Conv2D,
+    Conv2DTranspose,
     ConvLSTM2D,
-    Dense,
-    Flatten,
+    # Dense,
+    # Flatten,
     Input,
+    Lambda,
     # LSTM,
     # MaxPool2D,
     Reshape,
 )
 from keras.models import Model
-from keras import backend as K
 import numpy as np
 
 
@@ -21,23 +23,45 @@ class Mugen:
         self.pitches = pitches
 
     def build_model(self):
+        kernel_size = 2
+        strides = 2
+
         input_series = Input(
             shape=(self.time_steps, self.pitches, self.tracks))
 
         x = input_series
         x = Reshape((self.time_steps, self.pitches, 1, self.tracks))(x)
+
+        # Contract
+        x1 = x
         # x = ConvLSTM2D(
-        #     filters=32, kernel_size=(3, 1), padding='same', strides=2,
-        #     dropout=0.0, recurrent_dropout=0.0,
+        #     filters=32, kernel_size=(kernel_size, 1), padding='same',
+        #     strides=(strides, 1), dropout=0.0, recurrent_dropout=0.0,
         #     return_sequences=True)(x)
         x = ConvLSTM2D(
-            filters=32, kernel_size=(3, 1), padding='same', strides=2,
-            dropout=0.0, recurrent_dropout=0.0)(x)
+            filters=64, kernel_size=(kernel_size, 1), padding='same',
+            strides=(strides, 1), dropout=0.0, recurrent_dropout=0.0)(x)
 
-        x = Flatten()(x)
-        x = Dense(self.pitches * self.tracks, activation='relu')(x)
-        x = Reshape((self.pitches, self.tracks))(x)
-        prediction = x
+        # Expand
+        y = x
+
+        y = Conv2DTranspose(
+            filters=64, kernel_size=(kernel_size, 1), padding='same',
+            strides=(strides, 1), activation='relu')(y)
+        x1_last = Lambda(lambda x: x[:, -1, :, :])(x1)
+        y = Concatenate()([x1_last, y])
+        y = Conv2D(
+            filters=64, kernel_size=(kernel_size, 1), padding='same',
+            activation='relu')(y)
+        y = Conv2D(
+            filters=64, kernel_size=(kernel_size, 1), padding='same',
+            activation='relu')(y)
+        y = Conv2D(
+            filters=self.tracks, kernel_size=1, padding='same',
+            activation='relu')(y)
+
+        y = Reshape((self.pitches, self.tracks))(y)
+        prediction = y
 
         model = Model(input_series, prediction)
         model.compile(
