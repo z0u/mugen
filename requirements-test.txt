@@ -3,3 +3,4 @@ pylama==7.4.3
 pylama-pylint==3.0.1
 pytest==3.6.4
 pytest-bdd==2.21.0
+pytest-mock==1.10.0
