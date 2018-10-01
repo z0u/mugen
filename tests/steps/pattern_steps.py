@@ -41,14 +41,14 @@ def add_tempo(sequence, ticks_per_beat):
 
 @given(parse('a progression of 10 pitches'), target_fixture='sequences')
 def progression_sequences():
-    ticks_per_beat = 12
-    pitches = 12
+    ticks_per_beat = 4
+    pitches = 32
     time_steps = batch_size = pitches * ticks_per_beat
     tracks = 1
 
     base_progression = progression_2d(time_steps, pitches)
     base_progression = base_progression[:, :, np.newaxis]
-    base_progression = add_tempo(base_progression, ticks_per_beat)
+    # base_progression = add_tempo(base_progression, ticks_per_beat)
     width = base_progression.shape[1]
 
     sequences = np.zeros((batch_size, time_steps, width, tracks))

@@ -48,7 +48,7 @@ class HeadlessUi:
             return None
         output_dir = self.ensure_output_dir()
         filename = os.path.join(output_dir, 'model_graph.png')
-        plot_model(model, to_file=filename, show_shapes=True, rankdir='LR')
+        plot_model(model, to_file=filename, show_shapes=True, rankdir='TB')
         if self.dark_background:
             self.invert_image(filename)
         return filename
